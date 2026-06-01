@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fiction Child Dose Calculator</title>
+    <style>
+        :root {
+            --primary: #1565c0;
+            --primary-light: #e3f2fd;
+            --secondary: #2e7d32;
+            --danger: #d32f2f;
+            --text-main: #2c3e50;
+            --bg-body: #f4f6f9;
+            --border: #ccd1d9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            padding-bottom: 80px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0d47a1, var(--primary));
+            color: white;
+            padding: 18px 10px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 14px;
+            font-weight: 500;
+            color: #bbdefb;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 15px auto;
+            padding: 0 15px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #4f5d73;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #fff;
+            color: var(--text-main);
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .flex-row input, .flex-row select {
+            flex: 1;
+        }
+
+        .btn-calc {
+            width: 100%;
+            background-color: var(--secondary);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-calc:active {
+            background-color: #1b5e20;
+        }
+
+        .output-box {
+            background: #f8fafd;
+            border: 1px solid #bee3f8;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .output-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #e6ecf0;
+            font-size: 14px;
+            align-items: center;
+        }
+
+        .output-row:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #5a6a85;
+        }
+
+        .value {
+            font-weight: bold;
+            text-align: right;
+            color: var(--text-main);
+        }
+
+        .highlight {
+            color: var(--primary);
+            font-size: 18px;
+            background: var(--primary-light);
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .warning-text {
+            color: var(--danger);
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: 15px;
+            padding: 10px;
+            background: #fde8e8;
+            border-left: 4px solid var(--danger);
+            display: none;
+            border-radius: 4px;
+        }
+
+        footer {
+            background-color: #1e293b;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            font-size: 12px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Fiction Child Dose Calculator</h1>
+    <p>Created by Anil Bukharia</p>
+</header>
+
+<div class="container">
+    <div class="card">
+        
+        <div class="form-group">
+            <label>Child Age:</label>
+            <div class="flex-row">
+                <input type="number" id="age" value="12">
+                <select id="age-unit">
+                    <option value="months">Months</option>
+                    <option value="years">Years</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Child Weight (kg):</label>
+            <input type="number" id="weight" step="0.1" value="10">
+        </div>
+
+        <div class="form-group">
+            <label>Search/Filter Medicine:</label>
+            <input type="text" id="search" placeholder="Type here to filter..." oninput="filterDrugs()">
+        </div>
+
+        <div class="form-group">
+            <label>Select Medicine Generic:</label>
+            <select id="drug-select">
+                <!-- Dropdown populated by Javascript -->
+            </select>
+        </div>
+
+        <button class="btn-calc" onclick="calculateDose()">Calculate Dosage</button>
+
+        <div class="output-box">
+            <div class="output-row">
+                <span class="label">Medicine Name:</span>
+                <span class="value" id="out-name">-</span>
+            </div>
+            <div class="output-row">
+                <span class="label">Strength / Base:</span>
+                <span class="value" id="out-strength">-</span>
+            </div>
+            <div class="output-row">
+                <span class="label">Required Dose:</span>
+                <span class="value highlight" id="out-mg">-</span>
+            </div>
+            <div class="output-row">
+                <span class="label">Volume to Give:</span>
+                <span class="value highlight" id="out-ml">-</span>
+            </div>
+            <div class="output-row">
+                <span class="label">Frequency:</span>
+                <span class="value" id="out-freq">-</span>
+            </div>
+            
+            <div id="warning-msg" class="warning-text"></div>
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    Fiction Pharma Calculator PRO System
+</footer>
+
+<script>
+    // FOCUSED DRUG DATABASE (Matched exactly with your PHC available supply)
+    const drugDatabase = [
+        // Analgesics & Antipyretics
+        { id: "para_125_syp", name: "Paracetamol 125 mg syrup", rule: "standard", mgPerKg: 15, baseMg: 125, baseMl: 5, freq: "QID (Every 4-6 Hours)" },
+        { id: "para_100_syp", name: "Paracetamol 100 mg syrup", rule: "standard", mgPerKg: 15, baseMg: 100, baseMl: 5, freq: "QID (Every 4-6 Hours)", warning: "Ensure this is 100mg/5ml syrup, not 100mg/1ml drops. If drops, multiply volume by 0.2" },
+        { id: "para_125_tab", name: "Paracetamol 125 mg tablet", rule: "tablet", mgPerKg: 15, baseMg: 125, baseMl: 1, freq: "QID (Every 4-6 Hours)" },
+        { id: "ibu_syp", name: "Ibuprofen syrup (100mg/5ml)", rule: "standard", mgPerKg: 10, baseMg: 100, baseMl: 5, freq: "TID (Every 6-8 Hours)", warning: "Give after food to prevent gastric irritation." },
+        { id: "ibu_250_tab", name: "Ibuprofen 250 mg tablet", rule: "tablet", mgPerKg: 10, baseMg: 250, baseMl: 1, freq: "TID (Every 6-8 Hours)", warning: "Give after food to prevent gastric irritation." },
+        
+        // Antibiotics
+        { id: "amox_250_tab", name: "Amoxycillin 250 mg tablet", rule: "tablet_div", mgPerKg: 40, baseMg: 250, baseMl: 1, div: 3, freq: "TID (Divided in 3 Doses)" },
+        { id: "amox_syp", name: "Amoxycillin syrup (125mg/5ml)", rule: "divided", mgPerKg: 40, baseMg: 125, baseMl: 5, div: 3, freq: "TID (Divided in 3 Doses)" },
+        { id: "amoxyclav_syp", name: "Amoxyclav syrup (228.5mg/5ml)", rule: "amox_logic", mgPerKg: 40, baseMg: 200, baseMl: 5, div: 2, freq: "BID (Calculated on 200mg Amox base)" },
+        { id: "cefix_50_syp", name: "Cefixime 50 mg syrup", rule: "divided", mgPerKg: 8, baseMg: 50, baseMl: 5, div: 2, freq: "BID (Divided in 2 Doses)" },
+        { id: "oflox_syp", name: "Ofloxacin syrup (50mg/5ml)", rule: "divided", mgPerKg: 15, baseMg: 50, baseMl: 5, div: 2, freq: "BID (Divided in 2 Doses)" },
+        { id: "azith_syp", name: "Azithromycin syrup (200mg/5ml)", rule: "divided", mgPerKg: 10, baseMg: 200, baseMl: 5, div: 1, freq: "Once Daily (OD)" },
+        
+        // Antifungal & Antiprotozoal
+        { id: "fluco_50_tab", name: "Fluconazole 50 mg tablet", rule: "tablet", mgPerKg: 5, baseMg: 50, baseMl: 1, freq: "Once Daily (OD)" },
+        { id: "metro_syp", name: "Metronidazole syrup (200mg/5ml)", rule: "divided", mgPerKg: 30, baseMg: 200, baseMl: 5, div: 3, freq: "TID (Divided in 3 Doses)" },
+
+        // GI & Antiemetic
+        { id: "onda_syp", name: "Ondansetron syrup (2mg/5ml)", rule: "standard", mgPerKg: 0.15, baseMg: 2, baseMl: 5, freq: "SOS / Max TID" },
+        { id: "dicyc_syp", name: "Dicyclomine syrup (10mg/5ml)", rule: "special_dicyc", baseMg: 10, baseMl: 5, freq: "TID (Maximum)" },
+
+        // Antihistamines
+        { id: "cet_syp", name: "Cetirizine syrup (5mg/5ml)", rule: "special_cet", baseMg: 5, baseMl: 5, freq: "Once Daily (OD)" },
+
+        // Deworming
+        { id: "alben_syp", name: "Albendazole syrup (200mg/5ml)", rule: "special_alben", baseMg: 200, baseMl: 5, freq: "Single Dose", warning: "Crush/chew tablet or shake syrup well. Give after meal." }
+    ];
+
+    window.onload = function() {
+        populateDropdown(drugDatabase);
+    };
+
+    function populateDropdown(list) {
+        const select = document.getElementById("drug-select");
+        select.innerHTML = "";
+        
+        if (list.length === 0) {
+            select.innerHTML = "<option value=''>No match found</option>";
+            return;
+        }
+
+        list.forEach(drug => {
+            const option = document.createElement("option");
+            option.value = drug.id;
+            option.textContent = drug.name;
+            select.appendChild(option);
+        });
+    }
+
+    function filterDrugs() {
+        const term = document.getElementById("search").value.toLowerCase();
+        const filteredList = drugDatabase.filter(drug => drug.name.toLowerCase().includes(term));
+        populateDropdown(filteredList);
+    }
+
+    function calculateDose() {
+        const warnBox = document.getElementById("warning-msg");
+        warnBox.style.display = "none";
+        warnBox.innerHTML = "";
+
+        const weight = parseFloat(document.getElementById("weight").value) || 0;
+        const age = parseFloat(document.getElementById("age").value) || 0;
+        const ageUnit = document.getElementById("age-unit").value;
+        const drugId = document.getElementById("drug-select").value;
+
+        if (!drugId || drugId === "") {
+            alert("Please select a valid medicine.");
+            return;
+        }
+
+        if (weight <= 0) {
+            alert("Please enter a valid weight (kg).");
+            return;
+        }
+
+        const drug = drugDatabase.find(d => d.id === drugId);
+        let ageInMonths = (ageUnit === "years") ? age * 12 : age;
+        let isTablet = drug.rule.includes("tablet");
+
+        document.getElementById("out-name").textContent = drug.name.split(" (")[0];
+        document.getElementById("out-strength").textContent = isTablet ? `${drug.baseMg} mg Tablet` : `${drug.baseMg}mg / ${drug.baseMl}ml`;
+        document.getElementById("out-freq").textContent = drug.freq;
+
+        let requiredMg = 0;
+        let requiredMl = 0;
+
+        // DOSE CALCULATION LOGIC
+        switch (drug.rule) {
+            case "standard":
+            case "tablet":
+                requiredMg = weight * drug.mgPerKg;
+                requiredMl = (requiredMg / drug.baseMg) * drug.baseMl;
+                break;
+
+            case "divided":
+            case "tablet_div":
+                let totalDailyMg = weight * drug.mgPerKg;
+                requiredMg = totalDailyMg / drug.div; 
+                requiredMl = (requiredMg / drug.baseMg) * drug.baseMl;
+                break;
+
+            case "amox_logic":
+                let totalAmox = weight * drug.mgPerKg;
+                requiredMg = totalAmox / drug.div;
+                requiredMl = (requiredMg / drug.baseMg) * drug.baseMl;
+                break;
+
+            case "special_dicyc":
+                if (ageInMonths < 6) {
+                    showWarning("CRITICAL: Dicyclomine is contraindicated below 6 months (Risk of infant apnea).");
+                    return blockOutput();
+                } else if (ageInMonths >= 6 && ageInMonths <= 24) {
+                    requiredMg = 5; 
+                    requiredMl = (5 / drug.baseMg) * drug.baseMl;
+                } else {
+                    requiredMg = 10; 
+                    requiredMl = (10 / drug.baseMg) * drug.baseMl;
+                }
+                break;
+
+            case "special_cet":
+                if (ageInMonths < 6) {
+                    showWarning("Cetirizine is generally not recommended below 6 months.");
+                    return blockOutput();
+                } else if (ageInMonths < 24) {
+                    requiredMg = 2.5; 
+                    requiredMl = (2.5 / drug.baseMg) * drug.baseMl;
+                } else {
+                    requiredMg = 5; 
+                    requiredMl = (5 / drug.baseMg) * drug.baseMl;
+                }
+                break;
+
+            case "special_alben":
+                if (ageInMonths < 12) {
+                    showWarning("CRITICAL: Albendazole is contraindicated below 1 year of age.");
+                    return blockOutput();
+                } else if (ageInMonths < 24) {
+                    requiredMg = 200; 
+                    requiredMl = (200 / drug.baseMg) * drug.baseMl;
+                } else {
+                    requiredMg = 400; 
+                    requiredMl = (400 / drug.baseMg) * drug.baseMl;
+                }
+                break;
+        }
+
+        // Print Output
+        if (requiredMg > 0) {
+            document.getElementById("out-mg").textContent = `${requiredMg.toFixed(1)} mg`;
+            
+            if (isTablet) {
+                let formattedTabs = (Math.round(requiredMl * 4) / 4).toString(); 
+                document.getElementById("out-ml").textContent = `${formattedTabs} Tablet(s)`;
+            } else {
+                document.getElementById("out-ml").textContent = `${requiredMl.toFixed(1)} ml`;
+            }
+        }
+
+        if (drug.warning) {
+            showWarning(drug.warning);
+        }
+    }
+
+    function showWarning(msg) {
+        const warn = document.getElementById("warning-msg");
+        warn.innerHTML = msg;
+        warn.style.display = "block";
+    }
+
+    function blockOutput() {
+        document.getElementById("out-mg").textContent = "BLOCKED";
+        document.getElementById("out-ml").textContent = "BLOCKED";
+    }
+</script>
+
+</body>
+</html>
